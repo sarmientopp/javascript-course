@@ -26,7 +26,7 @@ body {
   margin: 20px 0;
 }
 button {
-  background: #4caf50;
+  background: #ffbeef;
   color: white;
   border: none;
   padding: 15px 30px;
@@ -36,7 +36,7 @@ button {
   margin: 10px;
 }
 button:hover {
-  background: #45a049;
+  background: #ffbeef;
   transform: translateY(-2px);
 }
 .controls {
@@ -52,7 +52,7 @@ input {
 }
 .hidden { display: none; }
 .player.winner {
-  background: linear-gradient(135deg, #4caf50, #45a049);
+  background: linear-gradient(135deg, #ffbeef, #ffbeef);
   transform: scale(1.05);
 }
 .player.loser { opacity: 0.5; }
