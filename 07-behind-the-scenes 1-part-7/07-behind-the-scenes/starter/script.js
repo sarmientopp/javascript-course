@@ -1,44 +1,117 @@
-'use strict';
+// // 'use strict';
 
-console.log(varX);
-console.log(letX);
-console.log(constX);
+// const person = {
+//   name: 'Jonas',
+//   greet: function () {
+//     console.log(`Hello I am ${this.name}`);
+//   },
+// };
 
-var varX = 1;
-let letX = 2;
-const constX = 3;
+// person.greet();
 
-function addDecl(a, b) {
-  return a + b;
-}
+// const anotherPerson = {
+//   name: 'Sarah',
+// };
 
-const addExpr = function (a, b) {
-  return a + b;
+// anotherPerson.greet = person.greet;
+// anotherPerson.greet();
+
+// //detach function
+// const greetFunction = person.greet;
+// greetFunction();
+
+// const obj = {
+//     name: "Object",
+
+//     regularMethod: function () {
+//         console.log('Regular:', this.name);
+//     },
+
+//     arrowMethod: () => {
+//         console.log('Arrow:', this.name);
+//     },
+// };
+
+// obj.regularMethod();
+// obj.arrowMethod();
+
+// const quiz = {
+//   name: 'Quiz Object',
+//   regularMethod() {
+//     console.log('Regular:', this.name);
+//   },
+//   arrowMethod: () => {
+//     console.log('Arrow:', this.name);
+//   },
+// };
+
+// quiz.regularMethod();
+// quiz.arrowMethod();
+
+// const timer = {
+//   name: 'Timer',
+//   start: function () {
+//     console.log(`${this.name} starting...`);
+
+//     const self = this;
+
+//     setTimeout(function () {
+//       console.log(`${self.name} finished`);
+//     }, 1000);
+//   },
+//   //Using arrow function
+//   startModern: function () {
+//     console.log(`${this.name} starting modern...`);
+
+//     setTimeout (() => {
+//         console.log(`${this.name} finished modern`);
+
+//     })
+//   }
+// };
+
+// timer.start();
+// timer.startModern();
+
+const user = {
+  name: 'Alice',
+  hobbies: ['reading', 'coding', 'gaming'],
+
+  // BROKEN: arrow function loses `this`
+  printHobbiesBad: () => {
+    this.hobbies.forEach(hobby => {
+      console.log(`${this.name} likes ${hobby}`); // this.name is undefined!
+    });
+  },
+
+  // FIXED: regular function preserves `this`
+  printHobbiesGood() {
+    this.hobbies.forEach(hobby => {
+      console.log(`${this.name} likes ${hobby}`);
+    });
+  },
 };
 
-const addArrow = (a, b) => a + b;
+user.printHobbiesBad();
+user.printHobbiesGood();
 
-// //Global Execution
-// console.log('Starting program');
+// console.log(varX);
+// // console.log(letX);
+// // console.log(constX);
 
-// function alpha() {
-//   console.log('alpha:start');
-//   beta();
-//   console.log('alpha:end');
+// var varX = 1;
+// let letX = 2;
+// const constX = 3;
+
+// console.log(addDec1(2, 3));
+// console.log(addExpr(2, 3));
+
+// function addDecl(a, b) {
+//   return a + b;
 // }
 
-// function beta() {
-//   console.log('beta');
-// }
+// const addExpr = function (a, b) {
+//   return a + b;
+// };
 
-// alpha();
-
-// function outerFunction() {
-//     console.log('Outer function start');
-//     console.log('Outer function end');
-// }
-
-// function innerFunction() {
-//     console.log('Inner function');
-//     console.trace();
-// }
+// const addArrow = (a, b) => a + b;
