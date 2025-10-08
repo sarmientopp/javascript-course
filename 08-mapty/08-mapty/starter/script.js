@@ -8,15 +8,13 @@ class Workout {
   clicks = 0;
 
   constructor(coords, distance, duration) {
-    // store the coordinates as an array of lat and long
     this.coords = coords;
-    // store distance in kilometers
+
     this.distance = distance;
-    // store duration in minutes
+
     this.duration = duration;
   }
 
-  // generate workout description
   _setDescription() {
     const months = [
       'January',
@@ -110,6 +108,7 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 // input elevation
 const inputElevation = document.querySelector('.form__input--elevation');
+
 class App {
   #map;
   #mapZoomLevel = 13;
