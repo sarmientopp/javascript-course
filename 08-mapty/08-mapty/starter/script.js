@@ -8,11 +8,15 @@ class Workout {
   clicks = 0;
 
   constructor(coords, distance, duration) {
+    // store the coordinates as an array of lat and long
     this.coords = coords;
+    // store distance in kilometers
     this.distance = distance;
+    // store duration in minutes
     this.duration = duration;
   }
 
+  // generate workout description
   _setDescription() {
     const months = [
       'January',
@@ -29,6 +33,7 @@ class Workout {
       'December',
     ];
 
+    // generate description
     this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${
       months[this.date.getMonth()]
     } ${this.date.getDate()}`;
@@ -40,7 +45,7 @@ class Workout {
 }
 
 const testWorkout = new Workout([40.7128, -74.006], 5.2, 24);
-console.log('Test workout:', testWorkout);
+console.log('Test workout: ', testWorkout);
 
 class Running extends Workout {
   type = 'running';
@@ -74,41 +79,45 @@ class Cycling extends Workout {
   }
 }
 
-// ===== TESTING THE CLASS HIERARCHY =====
-
 const run1 = new Running([39.7392, -104.9903], 5.2, 24, 178);
-console.log('=== RUNNING WORKOUT ===');
-console.log('Distance:', run1.distance, 'km');
-console.log('Duration:', run1.duration, 'min');
-console.log('Cadence:', run1.cadence, 'spm');
-console.log('Pace:', run1.pace.toFixed(1), 'min/km');
-console.log('Description:', run1.description);
-console.log('ID:', run1.id);
+console.log('Running workout:', run1);
+console.log('Running pace:', run1.pace.toFixed(1), 'min/km');
+console.log('Running description:', run1.description);
 
 const cycling1 = new Cycling([39.7392, -104.9903], 27, 95, 523);
-console.log('=== CYCLING WORKOUT ===');
-console.log('Distance:', cycling1.distance, 'km');
-console.log('Duration:', cycling1.duration, 'min');
-console.log('Elevation Gain:', cycling1.elevationGain, 'm');
-console.log('Speed:', cycling1.speed.toFixed(1), 'km/h');
-console.log('Description:', cycling1.description);
-console.log('ID:', cycling1.id);
+console.log('Cycling workout:', cycling1);
+console.log('Cycling speed:', cycling1.speed.toFixed(1), 'km/h');
+console.log('Cycling description:', cycling1.description);
 
-console.log('=== INHERITANCE TESTING ===');
-console.log(
-  'Both inherit from Workout:',
-  run1 instanceof Workout,
-  cycling1 instanceof Workout
-);
+run1.click();
+cycling1.click();
+console.log('Run clicks:', run1.clicks);
+console.log('Cycling clicks:', cycling1.clicks);
 
 console.log('=== TESTING GEOLOCATION API ===');
 
+// main form element
+const form = document.querySelector('.form');
+// container workout
+const containerWorkouts = document.querySelector('.workouts');
+// input type
+const inputType = document.querySelector('.form__input--type');
+// input distance
+const inputDistance = document.querySelector('.form__input--distance');
+// input duration
+const inputDuration = document.querySelector('.form__input--duration');
+// input cadence
+const inputCadence = document.querySelector('.form__input--cadence');
+// input elevation
+const inputElevation = document.querySelector('.form__input--elevation');
 class App {
   #map;
   #mapZoomLevel = 13;
   #mapEvent;
+  #workouts = [];
 
   constructor() {
+    console.log('App starting');
     this._getPosition();
   }
 
@@ -117,14 +126,20 @@ class App {
       console.log('🔍 Requesting user location...');
       navigator.geolocation.getCurrentPosition(
         this._loadMap.bind(this),
-        this._showError
+        this._handleLocationError.bind(this),
+        {
+          timeout: 10000,
+          enableHighAccuracy: true,
+          maximumAge: 600000,
+        }
       );
     } else {
-      alert('❌ Geolocation is not supported by this browser.');
+      alert('❌ Geolocation is not supported by this browser');
+      this._loadDefaultMap();
     }
   }
 
-  _showError(error) {
+  _handleLocationError(error) {
     console.error('Geolocation error:', error);
 
     let message = 'Could not get your position. ';
@@ -146,39 +161,70 @@ class App {
     }
 
     alert(`📍 ${message}`);
+    this._loadDefaultMap();
+  }
+
+  _loadDefaultMap() {
+    console.log('Loading default map location');
+
+    const defaultCorrds = [14.604, 120.994];
+
+    // from const map
+    // from 13 to this.#mapZoomLevel
+    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
+
+    // add open street map
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+      attribution:
+        '$copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(this.#map);
+
+    // new the map event listener
+    this.#map.on('click', this._showForm.bind(this));
+
+    console.log('Default map loaded successfully');
   }
 
   _loadMap(position) {
     const { latitude, longitude } = position.coords;
-    console.log(`✅ Location acquired: ${latitude}, ${longitude}`);
+    console.log(`Loading map at coordinates: ${latitude}, ${longitude}`);
 
+    // create coordinate array = very important
     const coords = [latitude, longitude];
 
+    // initialize map and center at user location
     this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
 
+    // add open street map
     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        '$copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.#map);
 
-    L.marker(coords).addTo(this.#map).bindPopup('📍 You are here!').openPopup();
+    // add a marker to the users location
+    L.marker(coords).addTo(this.#map).bindPopup('You are here!').openPopup();
 
-    this.#map.on('click', this._onMapClick.bind(this));
+    // new the map event listener
+    this.#map.on('click', this._showForm.bind(this));
 
-    console.log('🗺️ Map loaded successfully.');
+    console.log('Map loaded surccessfully at user location');
   }
 
-  _onMapClick(mapE) {
+  _showForm(mapE) {
     this.#mapEvent = mapE;
+    // extract coordinates when we click a part of the map
     const { lat, lng } = mapE.latlng;
+    console.log(`Map clicked at: ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
 
-    console.log(`🖱️ Map clicked at: ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
-
+    // create the market na blue
     L.marker([lat, lng])
       .addTo(this.#map)
-      .bindPopup(`Clicked here: ${lat.toFixed(4)}, ${lng.toFixed(4)}`)
+      .bindPopup(
+        `Workout location<br>Lat: ${lat.toFixed(4)}, ${lng.toFixed(4)}`
+      )
       .openPopup();
   }
 }
 
 const app = new App();
+console.log('Hour 2 complete!');
